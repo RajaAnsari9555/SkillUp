@@ -26,7 +26,7 @@ import MyEnrolledCourses from "./pages/MyEnrolledCourses";
 import getAllReviews from './customHooks/getAllReviews'
 import SearchWithAi from "./pages/SearchWithAi";
 
-export const serverUrl = "http://localhost:8000";
+export const serverUrl = "https://skillup-4r8i.onrender.com";
 
 const App = () => {
   const { userData } = useSelector((state) => state.user);
