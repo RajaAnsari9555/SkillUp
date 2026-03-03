@@ -1,5 +1,9 @@
+
+# Project Title
 🚀 SkillUp – AI Powered Course Selling Platform
 
+
+## Description
 SkillUp is a full-stack course marketplace platform where:
 
 👨‍🎓 Students can explore and enroll in courses
@@ -8,23 +12,24 @@ SkillUp is a full-stack course marketplace platform where:
 
 🤖 AI-powered smart search helps users find the most relevant courses instantly
 
-📌 Features
-👨‍🎓 Student Features
+## Features
 
-Secure Authentication (Register / Login)
+-👨‍🎓 Student Features
 
-Browse & Search Courses
+-Secure Authentication (Register / Login)
 
-🤖 AI-Powered Smart Search
+-Browse & Search Courses
 
-Enroll in Courses
+-🤖 AI-Powered Smart Search
 
-View Enrolled Courses Dashboard
+-Enroll in Courses
 
-Track Learning Progress
+-Fully Responsive UI
 
-Fully Responsive UI
 
+
+
+## Educator Feature
 👨‍🏫 Educator Features
 
 Secure Authentication (Register / Login)
@@ -38,105 +43,39 @@ Edit & Delete Courses
 Manage Student Enrollments
 
 View Course Performance Dashboard
+## Tech Stack
 
-🤖 AI Integration
+**Client:** React, Axios, TailwindCSS,React Router
 
-Intelligent Course Search
-
-Natural Language Search
-Example: "Best beginner web development course"
-
-Smart Course Recommendations
-
-🛠️ Tech Stack
-🎨 Frontend
-
-React.js
-
-Tailwind CSS
-
-Axios
-
-React Router
-
-⚙️ Backend
-
-Node.js
-
-Express.js
-
-MongoDB
-
-JWT Authentication
-
-🤖 AI
-
-Gemini Api
-
-🗂️ Project Structure
-SkillUp/
-│
-├── Fronted/        # Frontend (React)
-├── Backend/        # Backend (Node + Express)
-├── models/         # Database Models
-├── routes/         # API Routes
-├── controllers/    # Business Logic
-└── README.md
-
-🔐 Authentication & Authorization
-
-JWT-based Authentication
-
-Role-Based Access Control
-
-Student
-
-Educator
-
-Protected Routes
-
-1️⃣ Clone the Repository
-git clone https://github.com/RajaAnsari9555/SkillUp
-cd SkillUp
+**Server:** Node, Express,MongoDB,JWT Authentication,🤖 AI, Gemini APi
 
 
-2️⃣ Setup Backend
+
+
+
+
+
+## 🔗 Links
+[![portfolio](https://img.shields.io/badge/LIVE_LINK-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://skillup-1-s65l.onrender.com/)
+
+
+## Setup Backend
 cd Backend
+
 npm install
+
 npm run dev
 
-3️⃣ Setup Frontend
+
+## Setup Frontend
 cd Fronted
+
 npm install
+
 npm run dev
 
-🎯 Future Improvements
 
-💳 Payment Gateway Integration (Stripe / Razorpay)
+## Authors
 
-⭐ Course Reviews & Ratings
+- [@MDRajaAnsari](https://portfolio-md-eta.vercel.app/)
 
-🎥 Live Classes Integration
-
-🏆 Certificate Generation
-
-🛠️ Admin Dashboard
-
-🧠 Advanced AI Recommendations
-
-📌 Why SkillUp?
-
-SkillUp provides:
-
-Seamless Course Management
-
-AI-Enhanced Learning Discovery
-
-Secure & Scalable MERN Architecture
-
-Clean & Responsive User Interface
-
-👨‍💻 Author
-
-MD Raja Ansari
-MERN Stack Developer
