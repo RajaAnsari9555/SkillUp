@@ -99,7 +99,7 @@ Edit/Delete Course	❌	✅
 AI Search	✅	✅
 ⚙️ Installation & Setup
 1️⃣ Clone the Repository
-git clone https://github.com/your-username/SkillUp.git
+git clone https://github.com/RajaAnsari9555/SkillUp
 cd SkillUp
 2️⃣ Setup Backend
 cd Backend
