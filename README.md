@@ -1,8 +1,12 @@
 🚀 SkillUp – AI Powered Course Selling Platform
 
-SkillUp is a full-stack course marketplace where Students can enroll in courses and Educators can create, manage, and sell their courses.
+SkillUp is a full-stack course marketplace platform where:
 
-The platform integrates AI-powered course search to help students find the most relevant courses quickly and efficiently.
+👨‍🎓 Students can explore and enroll in courses
+
+👨‍🏫 Educators can create, manage, and sell their courses
+
+🤖 AI-powered smart search helps users find the most relevant courses instantly
 
 📌 Features
 👨‍🎓 Student Features
@@ -19,32 +23,33 @@ View Enrolled Courses Dashboard
 
 Track Learning Progress
 
-Responsive UI
+Fully Responsive UI
 
 👨‍🏫 Educator Features
 
-Secure Login / Registration
+Secure Authentication (Register / Login)
 
 Create & Publish Courses
 
-Upload Course Content (Videos, Descriptions, Pricing)
+Upload Course Content (Videos, Description, Pricing)
 
 Edit & Delete Courses
 
-Manage Enrollments
+Manage Student Enrollments
 
-View Course Performance
+View Course Performance Dashboard
 
 🤖 AI Integration
 
-Smart course search using AI
+Intelligent Course Search
 
-Natural language search (e.g., “Best beginner web development course”)
+Natural Language Search
+Example: "Best beginner web development course"
 
-Relevant course recommendations
+Smart Course Recommendations
 
 🛠️ Tech Stack
-Frontend
+🎨 Frontend
 
 React.js
 
@@ -54,7 +59,7 @@ Axios
 
 React Router
 
-Backend
+⚙️ Backend
 
 Node.js
 
@@ -64,24 +69,25 @@ MongoDB
 
 JWT Authentication
 
-AI Integration
+🤖 AI
 
-OpenAI API (or any AI search integration used)
+Gemini Api
 
 🗂️ Project Structure
 SkillUp/
 │
 ├── Fronted/        # Frontend (React)
-├── server/        # Backend (Node + Express)
-├── models/        # Database Models
-├── routes/        # API Routes
-├── controllers/   # Business Logic
+├── Backend/        # Backend (Node + Express)
+├── models/         # Database Models
+├── routes/         # API Routes
+├── controllers/    # Business Logic
 └── README.md
+
 🔐 Authentication & Authorization
 
-JWT-based authentication
+JWT-based Authentication
 
-Role-based access control:
+Role-Based Access Control
 
 Student
 
@@ -89,61 +95,46 @@ Educator
 
 Protected Routes
 
-📊 Core Functionalities
-Feature	Student	Educator
-Register/Login	✅	✅
-Browse Courses	✅	❌
-Enroll in Course	✅	❌
-Create Course	❌	✅
-Edit/Delete Course	❌	✅
-AI Search	✅	✅
-⚙️ Installation & Setup
 1️⃣ Clone the Repository
 git clone https://github.com/RajaAnsari9555/SkillUp
 cd SkillUp
+
+
 2️⃣ Setup Backend
 cd Backend
 npm install
 npm run dev
+
 3️⃣ Setup Frontend
 cd Fronted
 npm install
 npm run dev
-🌍 Environment Variables
 
-Create a .env file in the server folder:
-
-PORT=5000
-MONGO_URI=your_mongodb_connection
-JWT_SECRET=your_secret_key
-OPENAI_API_KEY=your_openai_key
 🎯 Future Improvements
 
-Payment Gateway Integration (Stripe/Razorpay)
+💳 Payment Gateway Integration (Stripe / Razorpay)
 
-Course Reviews & Ratings
+⭐ Course Reviews & Ratings
 
-Live Classes Integration
+🎥 Live Classes Integration
 
-Certificates Generation
+🏆 Certificate Generation
 
-Admin Dashboard
+🛠️ Admin Dashboard
 
-Advanced AI Recommendations
-
-
+🧠 Advanced AI Recommendations
 
 📌 Why SkillUp?
 
 SkillUp provides:
 
-Seamless course management
+Seamless Course Management
 
-AI-enhanced learning discovery
+AI-Enhanced Learning Discovery
 
-Secure and scalable architecture
+Secure & Scalable MERN Architecture
 
-Clean and responsive UI
+Clean & Responsive User Interface
 
 👨‍💻 Author
 
