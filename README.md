@@ -1,4 +1,5 @@
-
+# preview of my project
+https://github.com/user-attachments/assets/b5b2fdf4-a83e-42dc-8b06-704d06c5c7c0
 # Project Title
 🚀 SkillUp – AI Powered Course Selling Platform
 
