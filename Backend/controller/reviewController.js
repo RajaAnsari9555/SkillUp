@@ -4,7 +4,7 @@ import Review from "../model/reviewModel.js"
 export const createReview = async (req ,res) =>{
      try {
         const {rating , comment , courseId} = req.body
-        const userId = req.userId
+        const userId = req.userId 
 
 
         const course = await Course.findById(courseId)

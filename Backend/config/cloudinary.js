@@ -22,9 +22,9 @@ try {
 
     const uploadResult = await cloudinary.uploader.upload(filePath,{resource_type:"auto"})
 
-    fs.unlinkSync(filePath);
+    fs.unlinkSync(filePath);  
 
-    return uploadResult.secure_url
+    return uploadResult.secure_url 
 } catch (error) {
      fs.unlink(filePath)
      console.log(error);

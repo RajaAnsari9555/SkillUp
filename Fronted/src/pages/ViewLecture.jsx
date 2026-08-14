@@ -3,133 +3,161 @@ import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { serverUrl } from "../App";
-import { FaArrowLeftLong } from "react-icons/fa6";
-import { FaPlayCircle } from "react-icons/fa";
+import { FiArrowLeft, FiPlay, FiList } from "react-icons/fi";
+import Nav from "../component/Nav";
 
 const ViewLecture = () => {
   const { courseId } = useParams();
-  const { courseData } = useSelector((state) => state.course);
-  const { userData } = useSelector((state) => state.user);
-  const selectedCourse = courseData?.find((course) => course._id === courseId);
-
+  const { courseData } = useSelector((s) => s.course);
+  const selectedCourse = courseData?.find((c) => c._id === courseId);
   const [creatorData, setCreatorData] = useState(null);
   const [selectedLecture, setSelectedLecture] = useState(null);
-
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Set selectedLecture once selectedCourse is available
   useEffect(() => {
-    if (selectedCourse?.lectures?.length > 0) {
-      setSelectedLecture(selectedCourse.lectures[0]);
-    }
+    if (selectedCourse?.lectures?.length > 0) setSelectedLecture(selectedCourse.lectures[0]);
   }, [selectedCourse]);
 
-  // Fetch creator data
   useEffect(() => {
-    const getCreator = async () => {
-      if (selectedCourse?.creator) {
-        try {
-          const result = await axios.post(
-            serverUrl + "/api/course/creator",
-            { userId: selectedCourse?.creator?._id || selectedCourse?.creator },
-            { withCredentials: true }
-          );
-
-          console.log(result.data);
-          setCreatorData(result.data);
-        } catch (error) {
-          console.log(error);
-        }
-      }
-    };
-    getCreator();
+    if (!selectedCourse?.creator) return;
+    axios.post(serverUrl + "/api/course/creator", { userId: selectedCourse.creator?._id || selectedCourse.creator }, { withCredentials: true })
+      .then((r) => setCreatorData(r.data)).catch(console.log);
   }, [selectedCourse]);
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 flex flex-col md:flex-row gap-6">
-      {/* left or top */}
-      <div className="w-full md:w-2/3 bg-white rounded-2xl shadow-md p-6 border border-gray-200">
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold flex items-center justify-start gap-[20px] text-gray-800">
-            <FaArrowLeftLong
-              className="text-black w-[22px] h-[22px] cursor-pointer"
-              onClick={() => navigate("/")}
-            />
-            {selectedCourse?.title}
-          </h2>
+    <div className="page-bg min-h-screen flex flex-col relative overflow-hidden">
+      <Nav />
 
-          <div className="mt-2 flex gap-4 text-sm text-gray-500 font-medium">
-            <span>Category: {selectedCourse?.category}</span>
-            <span>Level: {selectedCourse?.level}</span>
+      <div className="flex flex-1 pt-[68px] max-h-screen overflow-hidden">
+        {/* Main video area */}
+        <div className="flex-1 flex flex-col overflow-y-auto">
+          {/* Video header */}
+          <div className="px-4 lg:px-8 py-4 border-b flex items-center gap-4"
+            style={{ borderColor: "var(--border)", background: "var(--bg-layer)" }}>
+            <button onClick={() => navigate("/mycourses")}
+              className="flex items-center gap-1.5 text-sm hover:scale-105 transition-transform"
+              style={{ color: "var(--text-secondary)" }}>
+              <FiArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">My Courses</span>
+            </button>
+            <div className="h-4 w-px" style={{ background: "var(--border)" }} />
+            <div className="flex-1 min-w-0">
+              <h1 className="text-sm lg:text-base font-bold truncate" style={{ color: "var(--text-primary)" }}>
+                {selectedCourse?.title}
+              </h1>
+              <div className="flex gap-3 text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+                <span>{selectedCourse?.category}</span>
+                {selectedCourse?.level && <span>• {selectedCourse.level}</span>}
+              </div>
+            </div>
+            {/* Mobile sidebar toggle */}
+            <button className="lg:hidden glass border p-2 rounded-xl" style={{ borderColor: "var(--border)" }}
+              onClick={() => setSidebarOpen((p) => !p)}>
+              <FiList className="w-4 h-4" style={{ color: "var(--text-primary)" }} />
+            </button>
+          </div>
+
+          {/* Video player */}
+          <div className="px-4 lg:px-8 py-6 flex-1">
+            <div className="rounded-2xl overflow-hidden bg-black aspect-video border mb-5"
+              style={{ borderColor: "var(--border)" }}>
+              {selectedLecture?.videoUrl ? (
+                <video className="w-full h-full" src={selectedLecture.videoUrl} controls autoPlay key={selectedLecture._id} />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center flex-col gap-3"
+                  style={{ color: "var(--text-muted)" }}>
+                  <FiPlay className="w-12 h-12 opacity-30" />
+                  <p className="text-sm">Select a lecture to start watching</p>
+                </div>
+              )}
+            </div>
+
+            {selectedLecture && (
+              <div className="glass rounded-2xl border p-5" style={{ borderColor: "var(--border)" }}>
+                <h2 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+                  {selectedLecture.lectureTitle}
+                </h2>
+                <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+                  {selectedCourse?.title}
+                </p>
+              </div>
+            )}
+
+            {/* Instructor card */}
+            {creatorData && (
+              <div className="glass rounded-2xl border p-5 mt-4" style={{ borderColor: "var(--border)" }}>
+                <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--text-muted)" }}>INSTRUCTOR</h3>
+                <div className="flex items-center gap-3">
+                  {creatorData.photoUrl ? (
+                    <img src={creatorData.photoUrl} alt="" className="w-12 h-12 rounded-full object-cover border"
+                      style={{ borderColor: "var(--border)" }} />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white"
+                      style={{ background: "linear-gradient(135deg,#a855f7,#06b6d4)" }}>
+                      {creatorData.name?.slice(0, 1).toUpperCase()}
+                    </div>
+                  )}
+                  <div>
+                    <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>{creatorData.name}</p>
+                    <p className="text-xs" style={{ color: "var(--text-muted)" }}>{creatorData.email}</p>
+                    {creatorData.description && (
+                      <p className="text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>{creatorData.description}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Video Player */}
-        <div className="aspect-video bg-black rounded-xl overflow-hidden mb-4 border border-gray-300">
-          {selectedLecture?.videoUrl ? (
-            <video
-              className="w-full h-full object-cover"
-              src={selectedLecture.videoUrl} // fixed
-              controls
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full text-white">
-              Select a lecture to start watching
-            </div>
-          )}
+        {/* Lecture sidebar */}
+        <div
+          className={`${sidebarOpen ? "flex" : "hidden"} lg:flex flex-col w-80 border-l overflow-y-auto flex-shrink-0 sidebar`}
+          style={{ borderColor: "var(--border)" }}
+        >
+          <div className="px-4 py-4 border-b" style={{ borderColor: "var(--border)" }}>
+            <h3 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>
+              All Lectures
+            </h3>
+            <p className="text-xs mt-0.5" style={{ color: "var(--text-muted)" }}>
+              {selectedCourse?.lectures?.length || 0} lectures
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-1.5 p-3">
+            {selectedCourse?.lectures?.length ? (
+              selectedCourse.lectures.map((lec, idx) => {
+                const active = selectedLecture?._id === lec._id;
+                return (
+                  <button key={idx} onClick={() => setSelectedLecture(lec)}
+                    className="flex items-center gap-3 p-3 rounded-xl text-left transition-all border text-sm"
+                    style={{
+                      background: active ? "rgba(168,85,247,0.15)" : "transparent",
+                      borderColor: active ? "rgba(168,85,247,0.4)" : "transparent",
+                    }}>
+                    <div className="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center text-xs font-bold"
+                      style={{ background: active ? "rgba(168,85,247,0.25)" : "var(--bg-card)", color: active ? "var(--neon-purple)" : "var(--text-muted)" }}>
+                      {active ? <FiPlay className="w-3 h-3" /> : idx + 1}
+                    </div>
+                    <span className="flex-1 truncate" style={{ color: active ? "var(--neon-purple)" : "var(--text-primary)" }}>
+                      {lec.lectureTitle}
+                    </span>
+                  </button>
+                );
+              })
+            ) : (
+              <p className="text-sm text-center py-8" style={{ color: "var(--text-muted)" }}>
+                No lectures available
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="mt-2">
-          <h2 className="text-xl font-semibold text-gray-800">
-            {selectedLecture?.lectureTitle} {/* fixed */}
-          </h2>
-        </div>
-      </div>
-
-      {/* right or bottom */}
-      <div className=" w-full md:w-1/3 bg-white rounded-2xl shadow-md border border-gray-200 h-fit">
-        <h2 className="  text-xl font-bold mb-4 text-gray-800 ">
-          All Lectures
-        </h2>
-        <div className=" flex flex-col gap-3 mb-6">
-          {selectedCourse?.lectures?.length > 0 ? (
-            selectedCourse?.lectures?.map((lecture, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedLecture(lecture)}
-                className={`flex  items-center justify-between p-3 rounded-lg border transition text-left ${
-                  selectedLecture?._id === lecture._id
-                    ? "bg-gray-200 border-gray-500"
-                    : "hover:bg-gray-50 border-gray-300"
-                }`}
-              >
-                <h2 className=" text-sm font-semibold text-gray-800">
-                  {lecture.lectureTitle}
-                </h2>
-                <FaPlayCircle className=" text-lg text-black" />
-              </button>
-            ))
-          ) : (
-            <p className=" text-gray-500">No Lecture Available</p>
-          )}
-        </div>
-
-        {/* educatorInfo */}
-
-{ creatorData &&
-        <div className=" mt-4 border-t pt-4">
-            <h3 className=" text-md font-semibold text-gray-700 mb-3">Educator</h3>
-
-            <div className=" flex items-center gap-4">
-                <img src={creatorData?.photoUrl}  alt="" className=" w-14 h-14 rounded-full object-cover" />
-            </div>
-
-            <div>
-                <h2 className=" text-base font-medium text-gray-800">{creatorData?.name}</h2>
-                <p className="  text-sm text-gray-600">{creatorData?.description}</p>
-                <p className=" text-sm text-gray-600">{creatorData?.email}</p>
-            </div>
-            </div>}
+        {/* Mobile overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 bg-black/50 z-10 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        )}
       </div>
     </div>
   );

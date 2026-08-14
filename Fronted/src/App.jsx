@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { useSelector } from "react-redux";
+import CursorEffect from "./component/CursorEffect";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -25,6 +26,8 @@ import ViewLecture from "./pages/ViewLecture";
 import MyEnrolledCourses from "./pages/MyEnrolledCourses";
 import getAllReviews from './customHooks/getAllReviews'
 import SearchWithAi from "./pages/SearchWithAi";
+import SystemDesign from "./pages/SystemDesign";
+import SystemDesignUpload from "./pages/educator/SystemDesignUpload";
 
 export const serverUrl = "https://skillup-4r8i.onrender.com";
 
@@ -42,6 +45,7 @@ const App = () => {
 
   return (
     <>
+      <CursorEffect />
       <ToastContainer />
       <Routes>
         {/* Public Routes */}
@@ -190,6 +194,19 @@ const App = () => {
             )
           }
           
+        />
+        {/* System Design — public */}
+        <Route path="/systemdesign" element={<SystemDesign />} />
+        {/* System Design upload — educator only */}
+        <Route
+          path="/systemdesign/upload"
+          element={
+            userData?.role === "educator" ? (
+              <SystemDesignUpload />
+            ) : (
+              <Navigate to="/signup" />
+            )
+          }
         />
       </Routes>
     </>

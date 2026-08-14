@@ -30,7 +30,7 @@ export const searchWithAi = async (req, res) => {
 
     only reply with one single keyword from the list above that best matches the query. Do not explain anything no extra text.
 
-    Query;${input}
+    Query;${input} 
     `
     
     const response = await ai.models.generateContent({

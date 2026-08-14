@@ -1,14 +1,11 @@
 import React, { useState } from "react";
 import logo from "../assets/logo.jpg";
-import google from "../assets/google.jpg";
-import { IoEyeOutline } from "react-icons/io5";
-import { IoMdEye } from "react-icons/io";
+import { IoEyeOutline, IoEyeSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import { serverUrl } from "../App";
 import axios from "axios";
-import { FaArrowLeftLong } from "react-icons/fa6";
-
+import { FiArrowLeft, FiZap } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
@@ -30,115 +27,150 @@ const Login = () => {
         { withCredentials: true }
       );
       dispatch(setUserData(result.data));
-      setLoading(false);
-      toast.success("Login Successfully");
+      toast.success("Login Successful!");
       navigate("/");
     } catch (error) {
-      console.log(error);
-      setLoading(false);
       toast.error(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="bg-[#dddbdb] w-[100vw] h-[100vh] flex items-center justify-center relative">
-        
-      <form
-        className="w-[90%] md:w-200 h-150 bg-[white] shadow-xl rounded-2xl flex relative"
-        onSubmit={(e) => e.preventDefault()}
+    <div className="page-bg min-h-screen flex items-center justify-center px-4 relative overflow-hidden">
+      {/* BG Orbs */}
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full blur-3xl pointer-events-none animate-orb"
+        style={{ background: "rgba(168,85,247,0.15)" }} />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-3xl pointer-events-none animate-orb"
+        style={{ background: "rgba(6,182,212,0.10)", animationDelay: "3s" }} />
+
+      {/* Back btn */}
+      <button
+        onClick={() => navigate("/")}
+        className="absolute top-6 left-6 flex items-center gap-2 text-sm transition-all hover:scale-105"
+        style={{ color: "var(--text-secondary)" }}
       >
-        <FaArrowLeftLong
-              className=" absolute top-[3%] md:top-[6%] left-[5%] w-[22px] h-[22px] cursor-pointer"
-              onClick={() => navigate("/")}
-            />
-        {/* left div */}
-        <div className="md:w-[50%] w-[100%] h-[100%] flex flex-col items-center justify-center gap-3">
-          <div>
-            <h1 className="font-semibold text-[black] text-2xl">Welcome back</h1>
-            <h2 className="text-[#999797] text-[18px]">Login in your Account</h2>
+        <FiArrowLeft className="w-4 h-4" />
+        Back to Home
+      </button>
+
+      <div className="w-full max-w-4xl glass rounded-3xl border overflow-hidden flex animate-scale-in"
+        style={{ borderColor: "var(--border)" }}>
+        {/* Left — Form */}
+        <div className="flex-1 p-8 lg:p-12 flex flex-col justify-center gap-5">
+          <div className="mb-2">
+            <h1 className="text-3xl font-bold mb-1" style={{ color: "var(--text-primary)" }}>
+              Welcome Back 👋
+            </h1>
+            <p style={{ color: "var(--text-secondary)" }} className="text-sm">
+              Sign in to continue learning
+            </p>
           </div>
 
-          <div className="flex flex-col gap-1 w-[80%] items-start justify-center px-3">
-            <label htmlFor="email" className="font-semibold">
+          {/* Email */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
               Email
             </label>
             <input
-              id="email"
               type="email"
-              className="border w-[100%] h-[35px] border-[#e7e6e6] text-[15px] px-[20px] placeholder"
-              placeholder="Enter Your Email"
-              onChange={(e) => setEmail(e.target.value)}
+              className="input-glass"
+              placeholder="you@example.com"
               value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
             />
           </div>
 
-          <div className="flex flex-col gap-1 w-[80%] items-start justify-center px-3 relative">
-            <label htmlFor="password" className="font-semibold">
+          {/* Password */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
               Password
             </label>
-            <input
-              id="password"
-              type={show ? "text" : "password"}
-              className="border w-[100%] h-[35px] border-[#e7e6e6] text-[15px] px-[20px] placeholder"
-              placeholder="Enter Your Password"
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
-            />
-            {!show ? (
-              <IoEyeOutline
-                className="absolute w-[20px] h-[20px] cursor-pointer right-[5%] bottom-[10%]"
-                onClick={() => setShow((prev) => !prev)}
+            <div className="relative">
+              <input
+                type={show ? "text" : "password"}
+                className="input-glass pr-11"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
               />
-            ) : (
-              <IoMdEye
-                className="absolute w-[20px] h-[20px] cursor-pointer right-[5%] bottom-[10%]"
-                onClick={() => setShow((prev) => !prev)}
-              />
-            )}
+              <button
+                className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                style={{ color: "var(--text-muted)" }}
+                onClick={() => setShow((p) => !p)}
+                type="button"
+              >
+                {show ? <IoEyeSharp className="w-5 h-5" /> : <IoEyeOutline className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
 
           <button
-            className="w-[80%] h-[40px] bg-black text-white cursor-pointer flex items-center justify-center rounded-[5px]"
-            disabled={loading}
-            onClick={handleLogin}
+            className="text-xs text-left transition-colors hover:underline"
+            style={{ color: "var(--neon-purple)" }}
+            onClick={() => navigate("/forget")}
           >
-            {loading ? <ClipLoader size={30} color="white" /> : "Login"}
+            Forgot your password?
           </button>
 
-          <span className="text-[13px] cursor-pointer text-[#585757]" onClick={()=>navigate("/forget")}>
-            Forget your password ?
-          </span>
+          <button
+            className="btn-primary w-full py-3 rounded-2xl font-semibold flex items-center justify-center gap-2 text-white"
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? <ClipLoader size={22} color="white" /> : <><FiZap className="w-4 h-4" /> Sign In</>}
+          </button>
 
-          <div className="w-[80%] flex items-center gap-2">
-            <div className="w-[25%] h-[0.5px] bg-[#c4c4c4]"></div>
-            <div className="w-[50%] text-[15px] text-[#6f6f6f] flex items-center justify-center">
-              Or continue
-            </div>
-            <div className="w-[25%] h-[0.5px] bg-[#c4c4c4]"></div>
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
+            <span className="text-xs" style={{ color: "var(--text-muted)" }}>or</span>
+            <div className="flex-1 h-px" style={{ background: "var(--border)" }} />
           </div>
 
-          <div className="w-[80%] h-[40px] border border-[black] rounded-[5px] flex items-center justify-center">
-            <img src={google} alt="" className="w-[25px]" />
-            <span>oogle</span>
-          </div>
-
-          <div className="text-[#6f6f6f]">
-            Create a new account{" "}
-            <span
-              className="underline underline-offset-1 text-[black] cursor-pointer"
+          <p className="text-sm text-center" style={{ color: "var(--text-secondary)" }}>
+            Don't have an account?{" "}
+            <button
+              className="font-semibold hover:underline"
+              style={{ color: "var(--neon-purple)" }}
               onClick={() => navigate("/signup")}
             >
-              SignUp
-            </span>
-          </div>
+              Sign Up
+            </button>
+          </p>
         </div>
 
-        {/* right div */}
-        <div className="w-[50%] h-[100%] rounded-2xl bg-[black] md:flex items-center justify-center flex-col hidden">
-          <img src={logo} alt="logo" className="w-30 shadow-2xl" />
-          <span className="text-2xl text-white">SKILLUP</span>
+        {/* Right — Branding */}
+        <div className="hidden md:flex w-[42%] flex-col items-center justify-center gap-6 relative overflow-hidden p-10"
+          style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(6,182,212,0.15))", borderLeft: "1px solid var(--border)" }}>
+          <div className="absolute top-10 right-10 w-32 h-32 rounded-full blur-3xl"
+            style={{ background: "rgba(168,85,247,0.25)" }} />
+          <div className="absolute bottom-10 left-10 w-28 h-28 rounded-full blur-3xl"
+            style={{ background: "rgba(6,182,212,0.2)" }} />
+          <div className="relative animate-float">
+            <div className="absolute inset-0 rounded-2xl blur-lg" style={{ background: "rgba(168,85,247,0.4)" }} />
+            <img src={logo} alt="SkillUp" className="relative w-20 h-20 rounded-2xl object-cover border border-white/20" />
+          </div>
+          <div className="text-center">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+              SkillUp
+            </h2>
+            <p className="text-sm mt-2" style={{ color: "var(--text-secondary)" }}>
+              AI-Powered Learning Platform
+            </p>
+          </div>
+          <div className="grid grid-cols-2 gap-3 w-full">
+            {[["50K+", "Students"], ["20K+", "Courses"], ["500+", "Instructors"], ["4.9★", "Rating"]].map(([v, l]) => (
+              <div key={l} className="glass rounded-xl p-3 text-center" style={{ borderColor: "var(--border)" }}>
+                <p className="font-bold text-sm bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">{v}</p>
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>{l}</p>
+              </div>
+            ))}
+          </div>
         </div>
-      </form>
+      </div>
     </div>
   );
 };

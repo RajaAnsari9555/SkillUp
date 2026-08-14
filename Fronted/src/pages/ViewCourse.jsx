@@ -1,383 +1,291 @@
 import React, { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa6";
-import {  useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setSelectedCourse } from "../redux/courseSlice";
-import { FaPlayCircle } from "react-icons/fa";
+import { FaPlayCircle, FaLock } from "react-icons/fa";
 import axios from "axios";
-import img from "../assets/empty.jpg";
+import empty from "../assets/empty.jpg";
 import Card from "../component/Card";
-import { serverUrl } from '../App';
-import { FaLock } from "react-icons/fa";
-import { FaArrowLeftLong } from "react-icons/fa6";
+import { serverUrl } from "../App";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
+import { FiArrowLeft, FiCheck, FiStar } from "react-icons/fi";
+import Nav from "../component/Nav";
 
 const ViewCourse = () => {
   const navigate = useNavigate();
   const { courseId } = useParams();
-  const { courseData, selectedCourse } = useSelector((state) => state.course);
-  const { userData } = useSelector((state) => state.user);
+  const { courseData, selectedCourse } = useSelector((s) => s.course);
+  const { userData } = useSelector((s) => s.user);
   const dispatch = useDispatch();
 
   const [selectedLecture, setSelectedLecture] = useState(null);
   const [creatorData, setCreatorData] = useState(null);
   const [creatorCourses, setCreatorCourses] = useState([]);
   const [isEnrolled, setIsEnrolled] = useState(false);
-  const [rating , setRating] = useState(0)
-  const [comment , setComment] = useState("")
-const [loading ,setLoading] = useState(false)
- 
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Fetch selected course
-  const fetchCourseData = () => {
-    courseData.map((course) => {
-      if (course._id === courseId) {
-        dispatch(setSelectedCourse(course));
-        console.log(selectedCourse);
-      }
-    });
-  };
+  useEffect(() => {
+    courseData?.forEach((c) => { if (c._id === courseId) dispatch(setSelectedCourse(c)); });
+    const enrolled = userData?.enrolledCourses?.some((c) => (typeof c === "string" ? c : c._id)?.toString() === courseId?.toString());
+    setIsEnrolled(!!enrolled);
+  }, [courseId, courseData, userData]);
 
-  
-    useEffect(()=>{
+  useEffect(() => {
+    if (!selectedCourse?.creator) return;
+    axios.post(serverUrl + "/api/course/creator", { userId: selectedCourse.creator?._id || selectedCourse.creator }, { withCredentials: true })
+      .then((r) => setCreatorData(r.data)).catch(console.log);
+  }, [selectedCourse]);
 
-    const getCreator = async () => {
-      if(selectedCourse?.creator){
-        try {
-           const result = await axios.post(serverUrl + "/api/course/creator" , {userId:selectedCourse?.creator?._id || selectedCourse?.creator}, {withCredentials:true})
-
-           console.log(result.data);
-           setCreatorData(result.data)
-           
-
-        } catch (error) {
-          console.log(error);
-          
-        }
-      }
+  useEffect(() => {
+    if (selectedCourse?._id && courseData?.length) {
+      setCreatorCourses(courseData.filter((c) => c.creator?._id === selectedCourse?.creator?._id && c._id !== courseId));
     }
-    getCreator()
+  }, [selectedCourse, courseData, courseId]);
 
-  },[selectedCourse])
-  
-  const checkEnrollment = () => {
-    const verify = userData?.enrolledCourses?.some(c => {
-    const enrolledId = typeof c === 'string' ? c : c._id;
-    return enrolledId?.toString() === courseId?.toString();
-  });
-
-  console.log("Enrollment verified:", verify);
-  if (verify) {
-    setIsEnrolled(true);
-  }
-};
-
-useEffect(() => {
-    fetchCourseData();
-     checkEnrollment();
-  }, [courseId, courseData , userData]);
-
-  // Handle payment order creation
-  const handleEnroll = async (courseId) => {
+  const handleEnroll = async () => {
     try {
-      const response = await axios.post(
-        serverUrl + "/api/payment/razorpay-order",
-        { courseId  },
-        { withCredentials: true }
-      );
-      console.log("Order Data:", response.data);
-
+      const response = await axios.post(serverUrl + "/api/payment/razorpay-order", { courseId }, { withCredentials: true });
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: response.data.amount,
         currency: "INR",
         name: "SKILLS-UP",
-        description: "COURSE ENROLLMENT PAYMENT",
+        description: "Course Enrollment",
         order_id: response.data.id,
-
-        handler: async (response) => {
-          console.log("Razorpay response:", response);
-
+        handler: async (res) => {
           try {
-            const verifyPayment = await axios.post(
-              serverUrl + "/api/payment/verify-payment",
-              {
-                ...response,
-                courseId,
-               userId:userData?._id
-              },
-              { withCredentials: true }
-            );
-
-            setIsEnrolled(true); // ✅ ensures Watch Now button shows immediately
-
-            toast.success(verifyPayment.data.message);
-          } catch (error) {
-            toast.error(error.response.data.message);
-          }
+            const verify = await axios.post(serverUrl + "/api/payment/verify-payment", { ...res, courseId, userId: userData?._id }, { withCredentials: true });
+            setIsEnrolled(true);
+            toast.success(verify.data.message);
+          } catch (e) { toast.error(e.response?.data?.message); }
         },
       };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (error) {
-      console.log(
-        "Error creating Razorpay order:",
-        error.response?.data || error.message
-      );
-      toast.error("Something went wrong while enrolling");
-    }
+      new window.Razorpay(options).open();
+    } catch (e) { toast.error("Something went wrong while enrolling"); }
   };
 
-  // Filter other courses by creator
-  useEffect(() => {
-    if (selectedCourse?._id && courseData.length > 0) {
-      const otherCourses = courseData.filter(
-        (course) =>
-          course.creator?._id === selectedCourse?.creator?._id &&
-          course._id !== courseId
-      );
-      setCreatorCourses(otherCourses);
-    }
-  }, [selectedCourse, courseData, courseId]);
-
-  const handleReview = async () =>{
-    setLoading(true)
+  const handleReview = async () => {
+    setLoading(true);
     try {
-      const result = await axios.post(serverUrl + "/api/review/createreview",{rating ,comment ,courseId} ,{withCredentials:true})
+      await axios.post(serverUrl + "/api/review/createreview", { rating, comment, courseId }, { withCredentials: true });
+      toast.success("Review added!");
+      setRating(0); setComment("");
+    } catch (e) { toast.error(e.response?.data?.message); }
+    finally { setLoading(false); }
+  };
 
-      setLoading(false)
-      toast.success("Review Added")
-      console.log(result.data);
-      setRating(0)
-      setComment("")
-
-      
-    } catch (error) {
-      console.log(error)
-      setLoading(false)
-      toast.error(error.response.data.message)
-      setRating(0)
-      setComment("")
-      
-    }
-
-  }
-
-  const calculateAvgReview = (reviews) => {
-    if(!reviews || reviews.length === 0){
-      return 0
-    }
-    const total = reviews.reduce((sum , review)=> sum + review.rating , 0)
-    return (total / reviews.length).toFixed(1)
-    
-  }
-
-  const avgRating = calculateAvgReview(selectedCourse?.reviews)
-
- 
-  
+  const avgRating = selectedCourse?.reviews?.length
+    ? (selectedCourse.reviews.reduce((s, r) => s + r.rating, 0) / selectedCourse.reviews.length).toFixed(1)
+    : 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-6xl mx-auto bg-white shadow-md rounded-xl p-6 space-y-6 relative">
+    <div className="page-bg min-h-screen relative overflow-hidden">
+      <Nav />
+      {/* BG */}
+      <div className="absolute top-32 right-10 w-80 h-80 rounded-full blur-3xl pointer-events-none animate-orb"
+        style={{ background: "rgba(168,85,247,0.08)" }} />
 
-        {/* Top Section */}
-        <div className="flex flex-col md:flex-row gap-6 ">
-             
+      <div className="max-w-6xl mx-auto px-4 pt-24 pb-16">
+        <button onClick={() => navigate("/allcourses")}
+          className="flex items-center gap-2 text-sm mb-6 hover:scale-105 transition-transform"
+          style={{ color: "var(--text-secondary)" }}>
+          <FiArrowLeft className="w-4 h-4" /> Back to Courses
+        </button>
+
+        {/* Top section */}
+        <div className="flex flex-col lg:flex-row gap-8 mb-8 animate-slide-up">
           {/* Thumbnail */}
-          <div className="w-full md:w-1/2">
-             <FaArrowLeftLong  className='text-[black] w-[22px] h-[22px] cursor-pointer' onClick={()=>navigate("/")}/>
-            {selectedCourse?.thumbnail ? <img
-              src={selectedCourse?.thumbnail}
-              alt="Course Thumbnail"
-              className="rounded-xl w-full object-cover"
-            /> :  <img
-              src={img}
-              alt="Course Thumbnail"
-              className="rounded-xl  w-full  object-cover"
-            /> }
+          <div className="lg:w-1/2">
+            <div className="rounded-2xl overflow-hidden border" style={{ borderColor: "var(--border)" }}>
+              <img src={selectedCourse?.thumbnail || empty} alt="Course" className="w-full h-64 lg:h-80 object-cover" />
+            </div>
           </div>
 
-          {/* Course Info */}
-          <div className="flex-1 space-y-2 mt-[20px]">
-            <h1 className="text-2xl font-bold">{selectedCourse?.title}</h1>
-            <p className="text-gray-600">{selectedCourse?.subTitle}</p>
+          {/* Info */}
+          <div className="lg:w-1/2 flex flex-col gap-4">
+            <span className="inline-block w-fit px-3 py-1 rounded-full text-xs font-semibold capitalize"
+              style={{ background: "rgba(168,85,247,0.15)", color: "var(--neon-purple)", border: "1px solid rgba(168,85,247,0.3)" }}>
+              {selectedCourse?.category}
+            </span>
+            <h1 className="text-2xl lg:text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+              {selectedCourse?.title}
+            </h1>
+            <p style={{ color: "var(--text-secondary)" }} className="text-sm leading-relaxed">
+              {selectedCourse?.subTitle}
+            </p>
 
-            {/* Rating & Price */}
-            <div className="flex items-start flex-col justify-between">
-              <div className="text-yellow-500 font-medium flex gap-2">
-               <span className=" flex items-center justify-start  gap-1"><FaStar/>{avgRating}</span>
-               <span className=" text-gray-400">(1,200 reviews)</span>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1.5">
+                <FaStar className="text-yellow-400 w-4 h-4" />
+                <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>{avgRating}</span>
+                <span className="text-xs" style={{ color: "var(--text-muted)" }}>({selectedCourse?.reviews?.length || 0})</span>
               </div>
-              <div>
-                <span className="text-lg font-semibold text-black">{selectedCourse?.price}</span>{" "}
-                <span className="line-through text-sm text-gray-400">₹599</span>
-              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                ₹{selectedCourse?.price}
+              </span>
             </div>
 
-            {/* Highlights */}
-            <ul className="text-sm text-gray-700 space-y-1 pt-2">
-              <li>✅ 10+ hours of video content</li>
-              <li>✅ Lifetime access to course materials</li>
-              
+            <ul className="space-y-1.5">
+              {["10+ hours of video content", "Lifetime access to materials", "Certificate on completion"].map((item) => (
+                <li key={item} className="flex items-center gap-2.5 text-sm" style={{ color: "var(--text-secondary)" }}>
+                  <FiCheck className="w-4 h-4 flex-shrink-0" style={{ color: "var(--neon-green)" }} />
+                  {item}
+                </li>
+              ))}
             </ul>
 
-            {/* Enroll Button */}
-            {!isEnrolled ?<button className="bg-[black] text-white px-6 py-2 rounded hover:bg-gray-700 mt-3" onClick={()=>handleEnroll(courseId , userData._id)}>
-              Enroll Now
-            </button> :
-            <button className="bg-green-200 text-green-600 px-6 py-2 rounded hover:bg-gray-100 hover:border mt-3" onClick={()=>navigate(`/viewlecture/${courseId}`)}>
-             Watch Now
+            {!isEnrolled ? (
+              <button className="btn-primary py-3.5 rounded-2xl text-base font-semibold text-white mt-2" onClick={handleEnroll}>
+                Enroll Now — ₹{selectedCourse?.price}
+              </button>
+            ) : (
+              <button
+                className="py-3.5 rounded-2xl text-base font-semibold mt-2 border transition-all hover:scale-[1.02]"
+                style={{ background: "rgba(16,185,129,0.15)", borderColor: "rgba(16,185,129,0.4)", color: "var(--neon-green)" }}
+                onClick={() => navigate(`/viewlecture/${courseId}`)}>
+                ▶ Watch Now
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Curriculum + Video preview */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-8">
+          {/* Lecture list */}
+          <div className="lg:col-span-2 glass rounded-2xl border p-5 animate-slide-in-left"
+            style={{ borderColor: "var(--border)" }}>
+            <h2 className="text-lg font-bold mb-1" style={{ color: "var(--text-primary)" }}>Course Curriculum</h2>
+            <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
+              {selectedCourse?.lectures?.length || 0} Lectures
+            </p>
+            <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+              {selectedCourse?.lectures?.map((lec, i) => (
+                <button key={i}
+                  disabled={!lec.isPreviewFree}
+                  onClick={() => lec.isPreviewFree && setSelectedLecture(lec)}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border text-left transition-all text-sm"
+                  style={{
+                    background: selectedLecture?.lectureTitle === lec.lectureTitle ? "rgba(168,85,247,0.12)" : "var(--bg-card)",
+                    borderColor: selectedLecture?.lectureTitle === lec.lectureTitle ? "rgba(168,85,247,0.4)" : "var(--border)",
+                    color: lec.isPreviewFree ? "var(--text-primary)" : "var(--text-muted)",
+                    cursor: lec.isPreviewFree ? "pointer" : "not-allowed",
+                    opacity: lec.isPreviewFree ? 1 : 0.55,
+                  }}
+                >
+                  {lec.isPreviewFree
+                    ? <FaPlayCircle className="text-purple-400 w-4 h-4 flex-shrink-0" />
+                    : <FaLock className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--text-muted)" }} />
+                  }
+                  <span className="flex-1 truncate">{lec.lectureTitle}</span>
+                  {lec.isPreviewFree && <span className="text-[10px] px-1.5 py-0.5 rounded-full"
+                    style={{ background: "rgba(16,185,129,0.15)", color: "var(--neon-green)" }}>FREE</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Preview player */}
+          <div className="lg:col-span-3 glass rounded-2xl border p-5 animate-slide-in-right"
+            style={{ borderColor: "var(--border)" }}>
+            <div className="rounded-xl overflow-hidden mb-4 bg-black aspect-video flex items-center justify-center">
+              {selectedLecture?.videoUrl ? (
+                <video src={selectedLecture.videoUrl} controls className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex flex-col items-center gap-2" style={{ color: "var(--text-muted)" }}>
+                  <FaPlayCircle className="w-12 h-12 opacity-30" />
+                  <p className="text-sm">Select a free preview lecture</p>
+                </div>
+              )}
+            </div>
+            {selectedLecture && (
+              <h3 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+                {selectedLecture.lectureTitle}
+              </h3>
+            )}
+          </div>
+        </div>
+
+        {/* Info sections */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          {[
+            { title: "What You'll Learn", content: `Learn ${selectedCourse?.category} from scratch to advanced.` },
+            { title: "Requirements", content: "Basic programming knowledge is helpful but not required." },
+            { title: "Who It's For", content: "Beginners, developers, and professionals looking to upgrade skills." },
+          ].map((s) => (
+            <div key={s.title} className="glass rounded-2xl border p-5 animate-fade-in"
+              style={{ borderColor: "var(--border)" }}>
+              <h3 className="text-sm font-bold mb-2" style={{ color: "var(--text-primary)" }}>{s.title}</h3>
+              <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{s.content}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Review + Instructor */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          {/* Write review */}
+          <div className="glass rounded-2xl border p-6 animate-slide-up" style={{ borderColor: "var(--border)" }}>
+            <h2 className="text-lg font-bold mb-4" style={{ color: "var(--text-primary)" }}>Write a Review</h2>
+            <div className="flex gap-1.5 mb-4">
+              {[1,2,3,4,5].map((s) => (
+                <button key={s} onClick={() => setRating(s)} className="transition-transform hover:scale-125">
+                  <FaStar className={`w-6 h-6 ${s <= rating ? "text-yellow-400" : ""}`}
+                    style={{ color: s <= rating ? "#facc15" : "var(--border)" }} />
+                </button>
+              ))}
+            </div>
+            <textarea className="input-glass mb-4" rows={3} placeholder="Write your review here..."
+              value={comment} onChange={(e) => setComment(e.target.value)} />
+            <button className="btn-primary px-6 py-2.5 rounded-xl text-sm font-semibold text-white flex items-center gap-2"
+              onClick={handleReview} disabled={loading}>
+              {loading ? <ClipLoader size={18} color="white" /> : <><FiStar className="w-4 h-4" /> Submit Review</>}
             </button>
-            }
           </div>
+
+          {/* Instructor */}
+          {creatorData && (
+            <div className="glass rounded-2xl border p-6 animate-slide-up" style={{ borderColor: "var(--border)" }}>
+              <h2 className="text-lg font-bold mb-4" style={{ color: "var(--text-primary)" }}>Instructor</h2>
+              <div className="flex items-start gap-4">
+                {creatorData.photoUrl ? (
+                  <img src={creatorData.photoUrl} alt="" className="w-16 h-16 rounded-full object-cover border"
+                    style={{ borderColor: "var(--border)" }} />
+                ) : (
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center font-bold text-xl text-white flex-shrink-0"
+                    style={{ background: "linear-gradient(135deg,#a855f7,#06b6d4)" }}>
+                    {creatorData.name?.slice(0,1).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <h3 className="font-bold" style={{ color: "var(--text-primary)" }}>{creatorData.name}</h3>
+                  <p className="text-xs mt-0.5" style={{ color: "var(--neon-purple)" }}>{creatorData.email}</p>
+                  <p className="text-sm mt-2" style={{ color: "var(--text-secondary)" }}>{creatorData.description}</p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* What You'll Learn */}
-        <div>
-          <h2 className="text-xl font-semibold mb-2">What You’ll Learn</h2>
-          <ul className="list-disc pl-6 text-gray-700 space-y-1">
-            <li>Learn {selectedCourse?.category} from Beginning</li>
-            
-          </ul>
-        </div>
-
-        {/* Requirements */}
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Requirements</h2>
-          <p className="text-gray-700">Basic programming knowledge is helpful but not required.</p>
-        </div>
-
-        {/* Who This Course Is For */}
-        <div>
-          <h2 className="text-xl font-semibold mb-2">Who This Course is For</h2>
-          <p className="text-gray-700">
-            Beginners, aspiring developers, and professionals looking to upgrade skills.
-          </p>
-        </div>
-
-        {/* course lecture   */}
-         <div className="flex flex-col md:flex-row gap-6">
-  {/* Left Side - Curriculum */}
-  <div className="bg-white w-full md:w-2/5 p-6 rounded-2xl shadow-lg border border-gray-200">
-    <h2 className="text-xl font-bold mb-1 text-gray-800">Course Curriculum</h2>
-    <p className="text-sm text-gray-500 mb-4">{selectedCourse?.lectures?.length} Lectures</p>
-
-    <div className="flex flex-col gap-3">
-      {selectedCourse?.lectures?.map((lecture, index) => (
-        <button
-          key={index}
-          disabled={!lecture.isPreviewFree}
-          onClick={() => {
-            if (lecture.isPreviewFree) {
-              setSelectedLecture(lecture);
-            }
-          }}
-          className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200 text-left ${
-            lecture.isPreviewFree
-              ? "hover:bg-gray-100 cursor-pointer border-gray-300"
-              : "cursor-not-allowed opacity-60 border-gray-200"
-          } ${
-            selectedLecture?.lectureTitle === lecture.lectureTitle
-              ? "bg-gray-100 border-gray-400"
-              : ""
-          }`}
-        >
-          <span className="text-lg text-gray-700">
-            {lecture.isPreviewFree ? <FaPlayCircle /> : <FaLock />}
-          </span>
-          <span className="text-sm font-medium text-gray-800">
-            {lecture.lectureTitle}
-          </span>
-        </button>
-      ))}
-    </div>
-  </div>
-
-  {/* Right Side - Video + Info */}
-  <div className="bg-white w-full md:w-3/5 p-6 rounded-2xl shadow-lg border border-gray-200">
-    <div className="aspect-video w-full rounded-lg overflow-hidden mb-4 bg-black flex items-center justify-center">
-      {selectedLecture?.videoUrl ? (
-        <video
-          src={selectedLecture.videoUrl}
-          controls
-          className="w-full h-full object-cover"
-        />
-      ) : (
-        <span className="text-white text-sm">Select a preview lecture to watch</span>
-      )}
-    </div>
-
-    <h3 className="text-lg font-semibold text-gray-900 mb-1">
-      {selectedLecture?.lectureTitle || "Lecture Title"}
-    </h3>
-    <p className="text-gray-600 text-sm">
-      {selectedCourse?.title}
-    </p>
-  </div>
-</div>
-<div className="mt-8 border-t pt-6">
-    <h2 className="text-xl font-semibold mb-2">Write a Review</h2>
-    <div className="mb-4">
-      <div className="flex gap-1 mb-2">
-        {[1, 2, 3, 4, 5].map((star) => (
-         
-            <FaStar  key={star}
-            onClick={() => setRating(star)} className={star <= rating ? "fill-yellow-500" : "fill-gray-300"} />
-         
-        ))}
-      </div>
-      <textarea
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        placeholder="Write your comment here..."
-        className="w-full border border-gray-300 rounded-lg p-2"
-        rows="3"
-      />
-      <button
-        
-        className="bg-black text-white mt-3 px-4 py-2 rounded hover:bg-gray-800" onClick={handleReview}
-      >
-        Submit Review
-      </button>
-    </div>
-
-        {/* Instructor Info */}
-        <div className="flex items-center gap-4 pt-4 border-t ">
-          {creatorData?.photoUrl ?<img
-            src={creatorData?.photoUrl}
-            alt="Instructor"
-            className="w-16 h-16 rounded-full object-cover"
-          />: <img
-            src={img}
-            alt="Instructor"
-            className="w-16 h-16 rounded-full object-cover"
-          />
-          }
+        {/* More courses */}
+        {creatorCourses.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold">{creatorData?.name}</h3>
-            <p className="md:text-sm text-gray-600 text-[10px] ">{creatorData?.description}</p>
-            <p className="md:text-sm text-gray-600 text-[10px] ">{creatorData?.email}</p>
-            
+            <h2 className="text-xl font-bold mb-5" style={{ color: "var(--text-primary)" }}>
+              More by this Instructor
+            </h2>
+            <div className="flex flex-wrap gap-6">
+              {creatorCourses.map((item, idx) => (
+                <Card key={idx} thumbnail={item.thumbnail} title={item.title} id={item._id}
+                  price={item.price} category={item.category} reviews={item.reviews} />
+              ))}
+            </div>
           </div>
-        </div>
-        <div>
-          <p className='text-xl font-semibold mb-2'>Other Published Courses by the Educator -</p>
-        <div className='w-full transition-all duration-300 py-[20px]   flex items-start justify-center lg:justify-start flex-wrap gap-6 lg:px-[80px] '>
-          
-            {
-               creatorCourses?.map((item,index)=>(
-                    <Card key={index} thumbnail={item.thumbnail} title={item.title} id={item._id} price={item.price} category={item.category}/>
-                ))
-            }
-        </div>
+        )}
       </div>
     </div>
-    </div>
-    </div>
-  )
-}
+  );
+};
 
-export default ViewCourse
+export default ViewCourse;

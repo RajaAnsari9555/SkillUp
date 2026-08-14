@@ -4,10 +4,10 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const transporter = nodemailer.createTransport({
-  service: "gmail", // lowercase works too
+  service: "gmail", // lowercase works too 
   auth: {
     user: process.env.USER_EMAIL,     // ✅ will read from .env
-    pass: process.env.USER_PASSWORD,  // ✅ app password, not Gmail password
+    pass: process.env.USER_PASSWORD,   // ✅ app password, not Gmail password
   },
 });
 

@@ -1,5 +1,5 @@
 import User from "../model/userModel.js";
-import validator from "validator"
+import validator from "validator" 
 import bcrypt from "bcryptjs"
 import genToken from "../config/token.js";
 import sendMail from "../config/sendMail.js";
@@ -34,10 +34,10 @@ export const signUp = async (req, res) => {
     })
     let token = await genToken(user._id)
     res.cookie("token",token ,{
-        httpOnly:true,
-        secure:true,
-        sameSite:"none",
-        maxAge: 7 * 24 * 60 * 1000
+        httpOnly:true,  
+        secure:true,  
+        sameSite:"none",  
+        maxAge: 7 * 24 * 60 *60* 1000
     })
     return res.status(201).json(user)
   } catch (error) {
@@ -57,7 +57,7 @@ export const login = async (req,res) =>{
     if(!isMatch){
         return res.status(400).json({message:" Incorrect Password"})
     }
-
+    
     let token = await genToken(user._id)
     res.cookie("token",token,{
         httpOnly:true,
@@ -73,7 +73,7 @@ export const login = async (req,res) =>{
 
 export const logOut = (req, res) => {
   try {
-    res.clearCookie("token", {
+    res.clearCookie("token", { 
       httpOnly: true,
       secure: true,
       sameSite: "none",
@@ -93,12 +93,12 @@ export const sendOTP = async (req,res) =>{
     }
     const otp = Math.floor(1000 + Math.random()*9000).toString()
 
-    user.resetOtp = otp,
+    user.resetOtp = otp, 
     user.otpExpires = Date.now() + 10 * 60 * 1000,
-    user.isOtpVerified = false
-
+    user.isOtpVerified = false 
+ 
     await user.save()
-    await sendMail(email , otp)
+    await sendMail(email , otp)  
     return res.status(200).json({message:"OTP send successfully"})
     
   } catch (error) {
