@@ -5,6 +5,7 @@ import courseSlice from "./courseSlice"
 import lectureSlice from "./lectureSlice"
 import reviewSlice from './reviewSlice'
 import systemDesignSlice from './systemDesignSlice'
+import noteSlice from './noteSlice'
 
  export const store = configureStore({
     reducer:{
@@ -13,6 +14,7 @@ import systemDesignSlice from './systemDesignSlice'
         lecture:lectureSlice,
         review:reviewSlice,
         systemDesign:systemDesignSlice,
+        notes:noteSlice,
     }
 
  });

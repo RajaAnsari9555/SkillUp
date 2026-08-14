@@ -68,6 +68,7 @@ const Footer = () => {
               {[
                 { label: "Home",       path: "/" },
                 { label: "All Courses",path: "/allcourses" },
+                { label: "Notes & PDFs",path: "/notes" },
                 { label: "Login",      path: "/login" },
                 { label: "My Profile", path: "/profile" },
                 { label: "AI Search",  path: "/search" },

@@ -89,6 +89,11 @@ const Dashboard = () => {
             onClick={() => navigate("/systemdesign/upload")}>
             🎬 System Design
           </button>
+          <button className="btn-secondary px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2"
+            style={{ color: "var(--text-primary)", borderColor: "var(--border)" }}
+            onClick={() => navigate("/notes/upload")}>
+            📄 Notes & PDFs
+          </button>
         </div>
 
         {/* Stats grid */}

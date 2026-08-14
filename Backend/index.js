@@ -10,6 +10,7 @@ import courseRouter from './route/courseRoute.js'
 import paymentRouter from './route/paymentRoute.js'
 import reviewRouter from './route/reviewRoute.js'
 import systemDesignRouter from './route/systemDesignRoute.js'
+import noteRouter from './route/noteRoute.js'
 
 const port = process.env.PORT
 const app = express()
@@ -28,6 +29,7 @@ app.use("/api/course",courseRouter)
 app.use("/api/payment",paymentRouter)
 app.use("/api/review",reviewRouter)
 app.use("/api/systemdesign",systemDesignRouter)
+app.use("/api/notes",noteRouter)
 
 
 

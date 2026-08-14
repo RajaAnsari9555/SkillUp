@@ -28,6 +28,8 @@ import getAllReviews from './customHooks/getAllReviews'
 import SearchWithAi from "./pages/SearchWithAi";
 import SystemDesign from "./pages/SystemDesign";
 import SystemDesignUpload from "./pages/educator/SystemDesignUpload";
+import Notes from "./pages/Notes";
+import NotesUpload from "./pages/educator/NotesUpload";
 
 export const serverUrl = "https://skillup-4r8i.onrender.com";
 
@@ -203,6 +205,19 @@ const App = () => {
           element={
             userData?.role === "educator" ? (
               <SystemDesignUpload />
+            ) : (
+              <Navigate to="/signup" />
+            )
+          }
+        />
+        {/* Notes — public */}
+        <Route path="/notes" element={<Notes />} />
+        {/* Notes upload — educator only */}
+        <Route
+          path="/notes/upload"
+          element={
+            userData?.role === "educator" ? (
+              <NotesUpload />
             ) : (
               <Navigate to="/signup" />
             )

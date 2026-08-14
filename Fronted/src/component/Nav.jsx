@@ -47,8 +47,9 @@ const Nav = () => {
   };
 
   const navLinks = [
-    { label: "Home", path: "/" },
+    { label: "Home",    path: "/" },
     { label: "Courses", path: "/allcourses" },
+    { label: "Notes",   path: "/notes" },
     { label: "AI Search", path: "/search" },
   ];
 
