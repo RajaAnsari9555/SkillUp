@@ -153,7 +153,7 @@ Rules: answer is 0-based index. All 4 options must be plausible. Intermediate di
           <h2 className="text-4xl lg:text-5xl font-bold mb-4" style={{ color: "var(--text-primary)" }}>
             Test Your{" "}
             <span className="bg-gradient-to-r from-cyan-500 to-purple-500 bg-clip-text text-transparent">
-              MERN Skills
+               Skills
             </span>
           </h2>
           <p className="max-w-xl mx-auto" style={{ color: "var(--text-secondary)" }}>
