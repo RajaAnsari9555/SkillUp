@@ -31,7 +31,7 @@ import SystemDesignUpload from "./pages/educator/SystemDesignUpload";
 import Notes from "./pages/Notes";
 import NotesUpload from "./pages/educator/NotesUpload";
 
-export const serverUrl = "http://localhost:8000";
+export const serverUrl = import.meta.env.VITE_SERVER_URL || "http://localhost:8000";
 
 const App = () => {
   const { userData } = useSelector((state) => state.user);
