@@ -300,10 +300,9 @@ const Notes = () => {
         {/* search + filter bar */}
         <div className="flex flex-col sm:flex-row gap-3 mb-8">
           <div className="relative flex-1">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--text-muted)" }} />
             <input
               type="text"
-              className="input-glass pl-11"
+              className="input-glass"
               placeholder="Search notes by title, subject or description…"
               value={search}
               onChange={e => setSearch(e.target.value)}

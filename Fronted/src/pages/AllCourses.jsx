@@ -114,8 +114,7 @@ const AllCourses = () => {
         {/* Search bar */}
         <div className="mb-8 max-w-xl animate-slide-up">
           <div className="relative">
-            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: "var(--text-muted)" }} />
-            <input type="text" className="input-glass pl-11" placeholder="Search courses..."
+            <input type="text" className="input-glass" placeholder="Search courses..."
               value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
         </div>

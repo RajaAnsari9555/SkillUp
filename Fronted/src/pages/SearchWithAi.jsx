@@ -94,10 +94,9 @@ function SearchWithAi() {
         <div className="glass rounded-3xl border p-6 lg:p-8 mb-10 animate-scale-in" style={{ borderColor: "var(--border)" }}>
           <div className="relative flex items-center gap-3">
             <div className="flex-1 relative">
-              <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: "var(--text-muted)" }} />
               <input
                 type="text"
-                className="input-glass pl-12 pr-16 py-4 text-base rounded-2xl"
+                className="input-glass pr-16 py-4 text-base rounded-2xl"
                 placeholder="e.g. React hooks, MongoDB aggregation, Node.js authentication..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
