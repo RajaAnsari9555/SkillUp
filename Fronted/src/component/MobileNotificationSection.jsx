@@ -135,54 +135,85 @@ const PhoneMockup = ({ visible }) => {
       style={{ animation: visible ? "float 4s ease-in-out infinite" : "none" }}>
 
       {/* outer glow */}
-      <div className="absolute inset-0 rounded-[48px] blur-3xl pointer-events-none"
-        style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.22),rgba(6,182,212,0.15))", transform: "scale(1.12)" }} />
+      <div className="absolute inset-0 rounded-[52px] blur-3xl pointer-events-none"
+        style={{ background: "linear-gradient(135deg,rgba(168,85,247,0.25),rgba(6,182,212,0.18))", transform: "scale(1.08)" }} />
 
-      {/* phone shell */}
-      <div className="relative w-[320px] rounded-[40px] overflow-hidden shadow-2xl"
+      {/* phone shell with realistic frame */}
+      <div className="relative w-[340px] rounded-[48px] overflow-hidden"
         style={{
-          background: "linear-gradient(160deg,#18182e 0%,#0d0d20 100%)",
-          border: "2px solid rgba(255,255,255,0.12)",
-          boxShadow: "0 30px 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.08)",
+          background: "#1a1a2e",
+          padding: "12px",
+          boxShadow: "0 40px 100px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.08)",
         }}>
-
-        {/* status bar */}
-        <div className="flex items-center justify-between px-5 pt-4 pb-1">
-          <span className="text-white text-[10px] font-semibold opacity-80">{timeStr}</span>
-          <div className="w-16 h-4 rounded-full"
-            style={{ background: "#0d0d20", border: "1px solid rgba(255,255,255,0.15)" }} />
-          <div className="flex items-center gap-1 opacity-70">
-            {[3,2,4].map((h, i) => (
-              <div key={i} className="w-[3px] rounded-full bg-white" style={{ height: `${h * 2}px` }} />
-            ))}
-            <div className="w-4 h-2.5 rounded-sm border border-white/50 ml-0.5 flex items-center justify-end pr-0.5">
-              <div className="w-2.5 h-1.5 rounded-sm bg-green-400" />
+        
+        {/* Screen with rounded corners */}
+        <div className="relative rounded-[38px] overflow-hidden"
+          style={{
+            background: "linear-gradient(165deg,#0f0f1e 0%,#1a1a2e 100%)",
+            boxShadow: "inset 0 0 0 1px rgba(255,255,255,0.05)",
+          }}>
+          
+          {/* Dynamic Island / Notch */}
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center gap-2">
+            <div className="h-7 px-6 rounded-full flex items-center justify-center"
+              style={{ 
+                background: "#000", 
+                border: "1px solid rgba(255,255,255,0.08)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.6)"
+              }}>
+              <div className="w-10 h-1 rounded-full bg-gray-800" />
+              <div className="w-2 h-2 rounded-full bg-blue-500 ml-4 opacity-80" />
             </div>
+          </div>
+
+          {/* status bar */}
+          <div className="flex items-center justify-between px-6 pt-5 pb-2 relative z-10">
+            <span className="text-white text-xs font-semibold">{timeStr}</span>
+            <div className="flex items-center gap-1.5">
+              {/* Signal */}
+              {[4,3,5].map((h, i) => (
+                <div key={i} className="w-1 rounded-full bg-white" style={{ height: `${h * 1.5}px` }} />
+              ))}
+              {/* WiFi icon */}
+              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 6c3.537 0 6.837 1.353 9.293 3.809a1 1 0 11-1.415 1.415A10.97 10.97 0 0012 8c-2.94 0-5.683 1.162-7.878 3.224a1 1 0 11-1.415-1.415A12.97 12.97 0 0112 6zm0 4c2.347 0 4.52.921 6.122 2.585a1 1 0 01-1.415 1.415A6.98 6.98 0 0012 12a6.98 6.98 0 00-4.707 2a1 1 0 01-1.415-1.415A8.98 8.98 0 0112 10zm0 4a3 3 0 11.001 5.999A3 3 0 0112 14z"/>
+              </svg>
+              {/* Battery */}
+              <div className="w-6 h-3 rounded border border-white/50 flex items-center justify-end px-0.5 ml-1">
+                <div className="w-4 h-2 rounded-sm bg-white" />
+              </div>
+              <div className="w-0.5 h-1.5 rounded-r-sm bg-white/50" />
+            </div>
+          </div>
+
+          {/* lock screen time */}
+          <div className="text-center py-6">
+            <p className="text-white text-5xl font-extralight tracking-tight">{timeStr}</p>
+            <p className="text-white/60 text-sm mt-1 font-light">{dateStr}</p>
+          </div>
+
+          {/* notification area */}
+          <div className="px-4 pb-6 flex flex-col gap-3 min-h-[320px]">
+            {notifications.map((notif, i) => (
+              <NotifCard key={notif.id} notif={notif} index={i} visible={visible} />
+            ))}
+          </div>
+
+          {/* home indicator */}
+          <div className="flex items-center justify-center pb-3">
+            <div className="w-32 h-1.5 rounded-full bg-white/30" />
           </div>
         </div>
 
-        {/* lock screen time */}
-        <div className="text-center py-4">
-          <p className="text-white text-4xl font-thin tracking-wide">{timeStr}</p>
-          <p className="text-white/50 text-xs mt-0.5">{dateStr}</p>
-        </div>
-
-        {/* notification area */}
-        <div className="px-3 pb-4 flex flex-col gap-2.5 min-h-[300px]">
-          {notifications.map((notif, i) => (
-            <NotifCard key={notif.id} notif={notif} index={i} visible={visible} />
-          ))}
-        </div>
-
-        {/* bottom bar */}
-        <div className="flex items-center justify-center pb-4 pt-1">
-          <div className="w-24 h-1 rounded-full bg-white opacity-30" />
-        </div>
+        {/* Side buttons hint */}
+        <div className="absolute right-0 top-32 w-1 h-12 rounded-l-full bg-gradient-to-b from-gray-600/50 to-gray-700/50" />
+        <div className="absolute right-0 top-48 w-1 h-16 rounded-l-full bg-gradient-to-b from-gray-600/50 to-gray-700/50" />
+        <div className="absolute left-0 top-40 w-1 h-8 rounded-r-full bg-gradient-to-b from-gray-600/50 to-gray-700/50" />
       </div>
 
-      {/* pulsing ring behind phone */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[360px] h-[360px] rounded-full pointer-events-none"
-        style={{ border: "1px solid rgba(168,85,247,0.2)", animation: "ping-slow 3s ease-out infinite" }} />
+      {/* subtle ring behind phone */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] rounded-full pointer-events-none"
+        style={{ border: "1px solid rgba(168,85,247,0.15)", animation: "ping-slow 4s ease-out infinite" }} />
     </div>
   );
 };

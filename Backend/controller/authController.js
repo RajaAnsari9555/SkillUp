@@ -7,18 +7,22 @@ import jwt from "jsonwebtoken";
 
 export const signUp = async (req, res) => {
   try {
+    console.log("📝 Signup request received:", req.body.email);
     const { name, email, password, role } = req.body
     let existUser = await User.findOne({email})
 
     if(existUser){
+        console.log("❌ User already exists:", email);
         return res.status(400).json({message:" User is already exist"})
     }
     if(!validator.isEmail(email)){
+        console.log("❌ Invalid email:", email);
         return res.status(400).json({
             message:"Enter Valid Email"
         })
     }
     if(password.length < 8){
+        console.log("❌ Password too short");
         return res.status(400).json({
             message:"Enter Strong Password"
         })
@@ -32,52 +36,80 @@ export const signUp = async (req, res) => {
         password:hashPassword,
         role
     })
+    console.log("✅ User created:", user._id);
+    
     let token = await genToken(user._id)
-    res.cookie("token",token ,{
-        httpOnly:true,  
-        secure:true,  
-        sameSite:"none",  
-        maxAge: 7 * 24 * 60 *60* 1000
+    console.log("✅ Token generated:", token.substring(0, 20) + "...");
+    
+    // Cookie settings - secure: false for localhost
+    const isProduction = process.env.NODE_ENV === 'production'
+    console.log("🔧 Environment:", isProduction ? "production" : "development");
+    console.log("🍪 Setting cookie with secure:", isProduction, "sameSite:", isProduction ? "none" : "lax");
+    
+    res.cookie("token", token, {
+        httpOnly: true,  
+        secure: isProduction, // false for localhost, true for production
+        sameSite: isProduction ? "none" : "lax", // lax for localhost, none for production
+        maxAge: 7 * 24 * 60 * 60 * 1000
     })
+    
+    console.log("✅ Cookie set, sending response");
     return res.status(201).json(user)
   } catch (error) {
+    console.log("❌ Signup error:", error);
     return res.status(500).json({message:`SignUp error ${error}`})
   }
 }
 
 export const login = async (req,res) =>{
   try {
+    console.log("🔐 Login request received:", req.body.email);
     const {email , password} = req.body
     let user = await User.findOne({email})
     if(!user){
+        console.log("❌ User not found:", email);
         return res.status(404).json({message:" User  not found"})
     }
 
     let isMatch = await bcrypt.compare(password , user.password)
     if(!isMatch){
+        console.log("❌ Incorrect password for:", email);
         return res.status(400).json({message:" Incorrect Password"})
     }
     
+    console.log("✅ Password matched for:", email);
     let token = await genToken(user._id)
-    res.cookie("token",token,{
-        httpOnly:true,
-        secure:true,
-        sameSite:"none",
+    console.log("✅ Token generated:", token.substring(0, 20) + "...");
+    
+    // Cookie settings - secure: false for localhost
+    const isProduction = process.env.NODE_ENV === 'production'
+    console.log("🔧 Environment:", isProduction ? "production" : "development");
+    console.log("🍪 Setting cookie with secure:", isProduction, "sameSite:", isProduction ? "none" : "lax");
+    
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: isProduction, // false for localhost, true for production
+        sameSite: isProduction ? "none" : "lax", // lax for localhost, none for production
         maxAge: 7 * 24 * 60 * 1000
     })
+    
+    console.log("✅ Cookie set, sending response");
     return res.status(200).json(user)
   } catch (error) {
+      console.log("❌ Login error:", error);
       return res.status(500).json({message:`Login error ${error}`})
   }
 }
 
 export const logOut = (req, res) => {
   try {
+    const isProduction = process.env.NODE_ENV === 'production'
     res.clearCookie("token", { 
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
     });
+    console.log("✅ User logged out, token cookie cleared")
     return res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
     return res.status(500).json({ message: `LogOut error ${error}` });

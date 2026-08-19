@@ -82,7 +82,15 @@ const NotesUpload = () => {
       setTitle(""); setDescription(""); setSubject("");
       setFile(null); setFileName("");
     } catch (e) {
-      toast.error(e.response?.data?.message || "Upload failed");
+      const errMsg = e.response?.data?.message || "Upload failed";
+      console.error("Upload error:", e);
+      
+      // Show specific guidance for authentication errors
+      if (e.response?.status === 401) {
+        toast.error("Session expired. Please login again.");
+      } else {
+        toast.error(errMsg);
+      }
     } finally { setUploading(false); }
   };
 

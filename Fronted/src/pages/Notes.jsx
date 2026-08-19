@@ -7,7 +7,7 @@ import Nav from "../component/Nav";
 import { useNavigate } from "react-router-dom";
 import {
   FiDownload, FiArrowLeft, FiSearch, FiBookOpen,
-  FiFileText, FiFilter, FiX,
+  FiFileText, FiFilter, FiX, FiEye, FiExternalLink,
 } from "react-icons/fi";
 import { HiOutlineDocumentText } from "react-icons/hi";
 
@@ -27,81 +27,175 @@ const TypeBadge = ({ type }) => {
   );
 };
 
-/* ── single note card ── */
-const NoteCard = ({ note, onDownload, index }) => (
-  <div
-    className="glass rounded-2xl border p-5 flex flex-col gap-3 transition-all duration-300 hover:scale-[1.02] animate-fade-in"
-    style={{
-      borderColor: "var(--border)",
-      animationDelay: `${index * 0.06}s`,
-      opacity: 0,
-      animationFillMode: "forwards",
-    }}
-    onMouseEnter={e => e.currentTarget.style.borderColor = "var(--border-hover)"}
-    onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
-  >
-    {/* icon + type */}
-    <div className="flex items-start justify-between gap-2">
-      <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
-        style={{ background: "var(--accent-soft)", color: "var(--accent)", border: "1px solid var(--border-hover)" }}>
-        <HiOutlineDocumentText className="w-5 h-5" />
-      </div>
-      <TypeBadge type={note.fileType} />
-    </div>
-
-    {/* subject chip */}
-    <span className="text-[10px] font-bold uppercase tracking-wider w-fit px-2.5 py-0.5 rounded-full"
-      style={{ background: "var(--bg-card)", color: "var(--text-muted)", border: "1px solid var(--border)" }}>
-      {note.subject}
-    </span>
-
-    {/* title & desc */}
-    <div>
-      <h3 className="text-sm font-bold leading-snug" style={{ color: "var(--text-primary)" }}>
-        {note.title}
-      </h3>
-      {note.description && (
-        <p className="text-xs mt-1 leading-relaxed line-clamp-2" style={{ color: "var(--text-secondary)" }}>
-          {note.description}
-        </p>
-      )}
-    </div>
-
-    {/* meta row */}
-    <div className="flex items-center justify-between mt-auto pt-1">
-      <div className="flex items-center gap-1.5">
-        {note.uploadedBy?.photoUrl ? (
-          <img src={note.uploadedBy.photoUrl} alt=""
-            className="w-5 h-5 rounded-full object-cover border" style={{ borderColor: "var(--border)" }} />
-        ) : (
-          <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
-            style={{ background: "linear-gradient(135deg,var(--accent),var(--accent-2))" }}>
-            {note.uploadedBy?.name?.slice(0, 1).toUpperCase()}
+/* ── Preview Modal ── */
+const PreviewModal = ({ note, onClose, onDownload }) => {
+  const isPDF = note.fileType === 'pdf';
+  const viewUrl = `${serverUrl}/api/notes/${note._id}/view`;
+  const downloadUrl = `${serverUrl}/api/notes/${note._id}/download`;
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in"
+      style={{ background: "rgba(0,0,0,0.85)" }}
+      onClick={onClose}>
+      <div className="glass rounded-3xl border w-full max-w-6xl max-h-[90vh] flex flex-col animate-scale-in"
+        style={{ borderColor: "var(--border-hover)" }}
+        onClick={e => e.stopPropagation()}>
+        
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: "var(--border)" }}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ background: "var(--accent-soft)", color: "var(--accent)" }}>
+              <HiOutlineDocumentText className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold" style={{ color: "var(--text-primary)" }}>{note.title}</h3>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>{note.subject}</p>
+            </div>
           </div>
-        )}
-        <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
-          {note.uploadedBy?.name}
-        </span>
-      </div>
-      <div className="flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
-        <FiDownload className="w-3 h-3" />
-        <span className="text-[10px]">{note.downloads || 0}</span>
+          <button onClick={onClose}
+            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110"
+            style={{ background: "var(--bg-card)", color: "var(--text-secondary)" }}>
+            <FiX className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Preview Content */}
+        <div className="flex-1 overflow-hidden p-5">
+          {isPDF ? (
+            <iframe
+              src={viewUrl}
+              className="w-full h-full rounded-2xl border"
+              style={{ borderColor: "var(--border)", minHeight: "500px" }}
+              title={note.title}
+            />
+          ) : (
+            <div className="flex flex-col items-center justify-center h-full gap-5">
+              <div className="w-20 h-20 rounded-3xl glass border flex items-center justify-center"
+                style={{ borderColor: "var(--border)" }}>
+                <HiOutlineDocumentText className="w-10 h-10" style={{ color: "var(--accent)" }} />
+              </div>
+              <div className="text-center">
+                <h4 className="text-lg font-bold mb-2" style={{ color: "var(--text-primary)" }}>
+                  Preview not available
+                </h4>
+                <p className="text-sm mb-1" style={{ color: "var(--text-secondary)" }}>
+                  This {note.fileType?.toUpperCase()} file cannot be previewed in browser.
+                </p>
+                <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                  Please download to view the content.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer Actions */}
+        <div className="flex items-center gap-3 p-5 border-t" style={{ borderColor: "var(--border)" }}>
+          <a
+            href={viewUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-secondary flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2"
+            style={{ textDecoration: "none" }}>
+            <FiExternalLink className="w-3.5 h-3.5" /> Open in New Tab
+          </a>
+          <a
+            href={downloadUrl}
+            onClick={() => onDownload(note._id)}
+            className="btn-primary flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-2"
+            style={{ textDecoration: "none" }}>
+            <FiDownload className="w-3.5 h-3.5" /> Download {note.fileType?.toUpperCase()}
+          </a>
+        </div>
       </div>
     </div>
+  );
+};
 
-    {/* download button */}
-    <a
-      href={note.fileUrl}
-      target="_blank"
-      rel="noreferrer"
-      onClick={() => onDownload(note._id)}
-      className="btn-primary w-full py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 mt-1"
-      style={{ textDecoration: "none" }}
+/* ── single note card ── */
+const NoteCard = ({ note, onDownload, onPreview, index }) => {
+  const downloadUrl = `${serverUrl}/api/notes/${note._id}/download`;
+  
+  return (
+    <div
+      className="glass rounded-2xl border p-5 flex flex-col gap-3 transition-all duration-300 hover:scale-[1.02] animate-fade-in"
+      style={{
+        borderColor: "var(--border)",
+        animationDelay: `${index * 0.06}s`,
+        opacity: 0,
+        animationFillMode: "forwards",
+      }}
+      onMouseEnter={e => e.currentTarget.style.borderColor = "var(--border-hover)"}
+      onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border)"}
     >
-      <FiDownload className="w-3.5 h-3.5" /> Download {note.fileType?.toUpperCase()}
-    </a>
-  </div>
-);
+      {/* icon + type */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+          style={{ background: "var(--accent-soft)", color: "var(--accent)", border: "1px solid var(--border-hover)" }}>
+          <HiOutlineDocumentText className="w-5 h-5" />
+        </div>
+        <TypeBadge type={note.fileType} />
+      </div>
+
+      {/* subject chip */}
+      <span className="text-[10px] font-bold uppercase tracking-wider w-fit px-2.5 py-0.5 rounded-full"
+        style={{ background: "var(--bg-card)", color: "var(--text-muted)", border: "1px solid var(--border)" }}>
+        {note.subject}
+      </span>
+
+      {/* title & desc */}
+      <div>
+        <h3 className="text-sm font-bold leading-snug" style={{ color: "var(--text-primary)" }}>
+          {note.title}
+        </h3>
+        {note.description && (
+          <p className="text-xs mt-1 leading-relaxed line-clamp-2" style={{ color: "var(--text-secondary)" }}>
+            {note.description}
+          </p>
+        )}
+      </div>
+
+      {/* meta row */}
+      <div className="flex items-center justify-between mt-auto pt-1">
+        <div className="flex items-center gap-1.5">
+          {note.uploadedBy?.photoUrl ? (
+            <img src={note.uploadedBy.photoUrl} alt=""
+              className="w-5 h-5 rounded-full object-cover border" style={{ borderColor: "var(--border)" }} />
+          ) : (
+            <div className="w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold text-white"
+              style={{ background: "linear-gradient(135deg,var(--accent),var(--accent-2))" }}>
+              {note.uploadedBy?.name?.slice(0, 1).toUpperCase()}
+            </div>
+          )}
+          <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+            {note.uploadedBy?.name}
+          </span>
+        </div>
+        <div className="flex items-center gap-1" style={{ color: "var(--text-muted)" }}>
+          <FiDownload className="w-3 h-3" />
+          <span className="text-[10px]">{note.downloads || 0}</span>
+        </div>
+      </div>
+
+      {/* action buttons */}
+      <div className="flex items-center gap-2 mt-1">
+        <button
+          onClick={() => onPreview(note)}
+          className="btn-secondary flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5">
+          <FiEye className="w-3.5 h-3.5" /> Preview
+        </button>
+        <a
+          href={downloadUrl}
+          onClick={() => onDownload(note._id)}
+          className="btn-primary flex-1 py-2.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5"
+          style={{ textDecoration: "none" }}>
+          <FiDownload className="w-3.5 h-3.5" /> Download
+        </a>
+      </div>
+    </div>
+  );
+};
 
 /* ══════════ Main Page ══════════ */
 const Notes = () => {
@@ -111,6 +205,7 @@ const Notes = () => {
   const [loading,  setLoading]  = useState(true);
   const [search,   setSearch]   = useState("");
   const [subject,  setSubject]  = useState("All");
+  const [previewNote, setPreviewNote] = useState(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -124,10 +219,17 @@ const Notes = () => {
   }, []);
 
   const handleDownload = async (id) => {
-    try {
-      await axios.patch(`${serverUrl}/api/notes/${id}/download`);
-      dispatch(bumpDownload(id));
-    } catch (e) { /* silent */ }
+    // Download count is already incremented by the backend endpoint
+    // Just update local state
+    dispatch(bumpDownload(id));
+  };
+
+  const handlePreview = (note) => {
+    setPreviewNote(note);
+  };
+
+  const handleClosePreview = () => {
+    setPreviewNote(null);
   };
 
   /* unique subjects */
@@ -146,6 +248,15 @@ const Notes = () => {
   return (
     <div className="page-bg min-h-screen">
       <Nav />
+      {/* Preview Modal */}
+      {previewNote && (
+        <PreviewModal
+          note={previewNote}
+          onClose={handleClosePreview}
+          onDownload={handleDownload}
+        />
+      )}
+      
       {/* bg orbs */}
       <div className="absolute top-32 right-10 w-80 h-80 rounded-full blur-3xl pointer-events-none animate-orb"
         style={{ background: "var(--orb-1)", opacity: 0.45 }} />
@@ -270,7 +381,13 @@ const Notes = () => {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
               {filtered.map((note, i) => (
-                <NoteCard key={note._id} note={note} onDownload={handleDownload} index={i} />
+                <NoteCard
+                  key={note._id}
+                  note={note}
+                  onDownload={handleDownload}
+                  onPreview={handlePreview}
+                  index={i}
+                />
               ))}
             </div>
           </>

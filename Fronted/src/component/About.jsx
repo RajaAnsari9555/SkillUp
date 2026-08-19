@@ -19,8 +19,9 @@ const About = () => (
     <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
       {/* video side */}
       <div className="lg:w-5/12 relative">
-        <div className="absolute -inset-4 rounded-3xl border animate-spin-slow pointer-events-none"
-          style={{ borderColor: "var(--border)" }} />
+        {/* Static border instead of animated spin */}
+        <div className="absolute -inset-4 rounded-3xl border pointer-events-none"
+          style={{ borderColor: "var(--border)", opacity: 0.3 }} />
         <video src={video} className="relative w-full rounded-2xl border shadow-2xl"
           style={{ borderColor: "var(--border)" }}
           controls autoPlay loop muted />

@@ -31,7 +31,7 @@ import SystemDesignUpload from "./pages/educator/SystemDesignUpload";
 import Notes from "./pages/Notes";
 import NotesUpload from "./pages/educator/NotesUpload";
 
-export const serverUrl = "https://skillup-4r8i.onrender.com";
+export const serverUrl = "http://localhost:8000";
 
 const App = () => {
   const { userData } = useSelector((state) => state.user);
@@ -48,7 +48,29 @@ const App = () => {
   return (
     <>
       <CursorEffect />
-      <ToastContainer />
+      <ToastContainer 
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+        toastStyle={{
+          background: 'var(--bg-card)',
+          border: '1px solid var(--border)',
+          borderRadius: '16px',
+          backdropFilter: 'blur(12px)',
+          color: 'var(--text-primary)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+        }}
+        progressStyle={{
+          background: 'linear-gradient(90deg, var(--accent), var(--accent-2))',
+        }}
+      />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<Home />} />

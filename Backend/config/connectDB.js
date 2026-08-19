@@ -1,15 +1,14 @@
 import mongoose from "mongoose"
 
-const connectDb = async ()=> {
+const connectDb = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URL)
-        console.log("DB connected");
-        
-        
+        await mongoose.connect(process.env.MONGODB_URL, {
+            dbName: 'SkillUp' // Match the existing database name (capital S and U)
+        });
+        console.log("✅ DB connected successfully");
     } catch (error) {
-        console.log(error);
-        
-        
+        console.error("❌ DB connection error:", error.message);
+        // Don't exit, let the app run (some features might work without DB)
     }
 }
 
