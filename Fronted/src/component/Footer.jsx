@@ -41,8 +41,17 @@ const Footer = () => {
 
             {/* Social icons */}
             <div className="flex gap-3">
-              {[FiGithub, FiTwitter, FiLinkedin, FiInstagram].map((Icon, i) => (
-                <button key={i}
+              {[
+                { Icon: FiGithub, url: "https://github.com/RajaAnsari9555", label: "GitHub" },
+                { Icon: FiTwitter, url: "https://x.com/MDRajaansari955", label: "Twitter" },
+                { Icon: FiLinkedin, url: "https://www.linkedin.com/in/md-raja-ansari-b9292b299/", label: "LinkedIn" },
+                { Icon: FiInstagram, url: "#", label: "Instagram" }
+              ].map(({ Icon, url, label }, i) => (
+                <a key={i}
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
                   className="w-9 h-9 rounded-xl glass border flex items-center justify-center transition-all duration-300 hover:scale-110"
                   style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                   onMouseEnter={e => {
@@ -54,7 +63,7 @@ const Footer = () => {
                     e.currentTarget.style.color = "var(--text-muted)";
                   }}>
                   <Icon className="w-4 h-4" />
-                </button>
+                </a>
               ))}
             </div>
           </div>
@@ -117,7 +126,16 @@ const Footer = () => {
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
           style={{ borderTop: "1px solid var(--border)" }}>
           <p className="text-xs" style={{ color: "var(--text-muted)" }}>
-            © {new Date().getFullYear()} SkillUp. All rights reserved.
+            © {new Date().getFullYear()} SkillUp. Built with ❤️ by{" "}
+            <a 
+              href="https://github.com/RajaAnsari9555" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-purple-400 transition-colors"
+            >
+              MD Raja Ansari
+            </a>
+            . All rights reserved.
           </p>
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
