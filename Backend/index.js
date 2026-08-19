@@ -19,9 +19,9 @@ app.use(cookieParser())
 
 app.use(cors({
     origin:["https://skillup-1-s65l.onrender.com",
-     "http://localhost:5173"],
+     "http://localhost:5173",
+     "http://localhost:5174"],
     credentials:true
-
 }))
 app.use("/api/auth",authRouter)
 app.use("/api/user",userRouter)

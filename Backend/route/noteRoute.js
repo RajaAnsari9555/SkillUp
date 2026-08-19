@@ -3,7 +3,8 @@ import {
   uploadNote,
   getAllNotes,
   getMyNotes,
-  incrementDownload,
+  viewNote,
+  downloadNote,
   deleteNote,
 } from "../controller/noteController.js";
 import isAuth from "../middleware/isAuth.js";
@@ -13,7 +14,8 @@ const noteRouter = express.Router();
 
 /* public */
 noteRouter.get("/all", getAllNotes);
-noteRouter.patch("/:noteId/download", incrementDownload);
+noteRouter.get("/:noteId/view", viewNote);
+noteRouter.get("/:noteId/download", downloadNote);
 
 /* educator only */
 noteRouter.post("/upload", isAuth, upload.single("file"), uploadNote);
