@@ -55,12 +55,12 @@ const SystemDesign = () => {
     <div className="page-bg min-h-screen">
       <Nav />
       {/* bg orbs */}
-      <div className="absolute top-32 left-10 w-80 h-80 rounded-full blur-3xl pointer-events-none animate-orb"
+      <div className="absolute top-32 left-10 w-40 h-40 lg:w-80 lg:h-80 rounded-full blur-3xl pointer-events-none animate-orb"
         style={{ background: "var(--orb-1)", opacity: 0.5 }} />
-      <div className="absolute bottom-20 right-10 w-72 h-72 rounded-full blur-3xl pointer-events-none animate-orb"
+      <div className="absolute bottom-20 right-10 w-36 h-36 lg:w-72 lg:h-72 rounded-full blur-3xl pointer-events-none animate-orb"
         style={{ background: "var(--orb-2)", opacity: 0.4, animationDelay: "3s" }} />
 
-      <div className="max-w-7xl mx-auto px-4 pt-24 pb-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         {/* back */}
         <button onClick={() => navigate("/")}
           className="flex items-center gap-2 text-sm mb-6 hover:scale-105 transition-transform"
@@ -83,7 +83,7 @@ const SystemDesign = () => {
               <span className="text-xs font-semibold uppercase tracking-widest"
                 style={{ color: "var(--accent)" }}>System Design with MD</span>
             </div>
-            <h1 className="text-3xl lg:text-4xl font-extrabold" style={{ color: "var(--text-primary)" }}>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold" style={{ color: "var(--text-primary)" }}>
               System Design Masterclass
             </h1>
             <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
@@ -188,7 +188,7 @@ const SystemDesign = () => {
             </div>
 
             {/* ── RIGHT: topic sidebar ── */}
-            <div className="lg:w-80 flex-shrink-0 flex flex-col gap-3 lg:max-h-[700px] lg:overflow-y-auto pr-1">
+            <div className="lg:w-80 flex-shrink-0 flex flex-col gap-3 max-h-[50vh] lg:max-h-[700px] overflow-y-auto pr-1">
               {Object.entries(grouped).map(([topic, topicVideos]) => {
                 const isOpen   = openTopics[topic];
                 const hasActive = topicVideos.some(v => v._id === selectedVideo?._id);

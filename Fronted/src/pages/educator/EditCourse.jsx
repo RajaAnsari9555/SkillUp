@@ -13,6 +13,14 @@ import Nav from "../../component/Nav";
 const categories = ["App Development","AI/ML","Data Science","AI Tools","Data Analytics","Ethical Hacking","UI/UX Design","Web Development","Others"];
 const levels    = ["Beginner","Intermediate","Advance"];
 
+const InputField = ({ label, value, onChange, placeholder, type = "text" }) => (
+  <div className="flex flex-col gap-1.5">
+    <label className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>{label}</label>
+    <input type={type} className="input-glass" placeholder={placeholder}
+      value={value} onChange={(e) => onChange(e.target.value)} />
+  </div>
+);
+
 const EditCourse = () => {
   const navigate   = useNavigate();
   const { courseId } = useParams();
@@ -87,14 +95,6 @@ const EditCourse = () => {
     } catch (e) { toast.error(e.response?.data?.message); }
     finally { setLoading1(false); }
   };
-
-  const InputField = ({ label, value, onChange, placeholder, type = "text" }) => (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>{label}</label>
-      <input type={type} className="input-glass" placeholder={placeholder}
-        value={value} onChange={(e) => onChange(e.target.value)} />
-    </div>
-  );
 
   return (
     <div className="page-bg min-h-screen relative overflow-hidden">

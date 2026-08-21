@@ -108,7 +108,7 @@ const SystemDesignUpload = () => {
       <div className="absolute top-32 right-10 w-72 h-72 rounded-full blur-3xl pointer-events-none animate-orb"
         style={{ background: "rgba(168,85,247,0.10)" }} />
 
-      <div className="max-w-5xl mx-auto px-4 pt-24 pb-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         <button onClick={() => navigate("/dashboard")}
           className="flex items-center gap-2 text-sm mb-6 hover:scale-105 transition-transform"
           style={{ color: "var(--text-secondary)" }}>
@@ -297,7 +297,7 @@ const SystemDesignUpload = () => {
                           </p>
                         </div>
                         <button
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-lg btn-danger flex-shrink-0"
+                          className="sm:opacity-0 sm:group-hover:opacity-100 opacity-100 transition-opacity p-1.5 rounded-lg btn-danger flex-shrink-0"
                           onClick={() => handleDelete(v._id)}
                           disabled={deletingId === v._id}>
                           {deletingId === v._id

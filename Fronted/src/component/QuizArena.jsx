@@ -6,9 +6,8 @@ import {
 } from "react-icons/fi";
 import { FaTrophy, FaMedal } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import { serverUrl } from "../App";
 
-const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 const TOPICS = ["MongoDB","Express.js","React.js","Node.js","REST API","JWT Auth","Redux","Async/Await"];
 const QUESTION_TIME = 20;
 
@@ -66,14 +65,12 @@ const QuizArena = () => {
   const fetchQuestions = async () => {
     setPhase("loading"); setLoadError(false);
     try {
-      const res = await axios.post(GEMINI_URL,
-        { contents: [{ parts: [{ text: `Generate 5 multiple-choice quiz questions about MERN stack (${TOPICS.join(", ")}).
+      const prompt = `Generate 5 multiple-choice quiz questions about MERN stack (${TOPICS.join(", ")}).
 Return ONLY a JSON array (no markdown, no code blocks): [{"question":"...","options":["A","B","C","D"],"answer":0,"explanation":"...","topic":"..."}]
-Rules: answer is 0-based index. All 4 options must be plausible. Intermediate difficulty. Return ONLY the raw JSON array, nothing else.` }] }] },
-        { headers: { "Content-Type": "application/json" } }
-      );
-      const raw = res.data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-      // strip markdown code fences if model wraps anyway
+Rules: answer is 0-based index. All 4 options must be plausible. Intermediate difficulty. Return ONLY the raw JSON array, nothing else.`;
+
+      const res = await axios.post(`${serverUrl}/api/quiz/generate`, { prompt });
+      const raw = res.data?.text || "";
       const cleaned = raw.replace(/```json|```/g, "").trim();
       const match = cleaned.match(/\[[\s\S]*\]/);
       if (!match) throw new Error("No JSON array found in response");
@@ -81,7 +78,7 @@ Rules: answer is 0-based index. All 4 options must be plausible. Intermediate di
       if (!Array.isArray(parsed) || !parsed.length) throw new Error("Empty or invalid array");
       setQuestions(parsed);
     } catch (err) {
-      console.error("Gemini API error:", err?.response?.data || err?.message || err);
+      console.error("Quiz generation error:", err?.response?.data || err?.message || err);
       setQuestions(fallbackQuestions); setLoadError(true);
     } finally {
       setPhase("quiz"); setCurrentQ(0); setScore(0);
@@ -111,9 +108,17 @@ Rules: answer is 0-based index. All 4 options must be plausible. Intermediate di
   };
 
   const finishQuiz = () => {
+    const correctCount = answers.filter(a => a.correct).length;
     const entry = { name: userData?.name || "Anonymous", score, streak: bestStreak,
+      correct: correctCount, total: questions.length,
       date: new Date().toLocaleDateString(), avatar: (userData?.name || "A").slice(0,1).toUpperCase() };
-    const updated = [...leaderboard, entry].sort((a,b) => b.score - a.score).slice(0,10);
+    // dedupe by name keeping highest score, then take top 5
+    const map = new Map();
+    [...leaderboard, entry].forEach(e => {
+      const existing = map.get(e.name);
+      if (!existing || e.score > existing.score) map.set(e.name, e);
+    });
+    const updated = [...map.values()].sort((a,b) => b.score - a.score).slice(0, 5);
     setLeaderboard(updated);
     localStorage.setItem("skillup_leaderboard", JSON.stringify(updated));
     setPhase("result");
@@ -401,6 +406,7 @@ Rules: answer is 0-based index. All 4 options must be plausible. Intermediate di
                     </div>
                     <div className="text-right flex-shrink-0">
                       <p className="text-sm font-bold text-yellow-500">{entry.score}</p>
+                      <p className="text-[10px]" style={{ color: "var(--text-muted)" }}>{entry.correct}/{entry.total}</p>
                       {entry.streak >= 2 && <p className="text-xs text-orange-400">🔥{entry.streak}</p>}
                     </div>
                   </div>
