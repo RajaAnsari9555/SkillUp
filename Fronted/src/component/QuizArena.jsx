@@ -17,6 +17,11 @@ const fallbackQuestions = [
   { question: "Which React hook runs side effects after render?", options: ["useState","useEffect","useContext","useReducer"], answer: 1, explanation: "useEffect runs side effects and replaces lifecycle methods.", topic: "React.js" },
   { question: "What does JWT stand for?", options: ["JavaScript Web Token","JSON Web Token","Java Web Transfer","JSON Web Transfer"], answer: 1, explanation: "JWT = JSON Web Token — a compact URL-safe authentication token.", topic: "JWT Auth" },
   { question: "Which RTK function creates reducers + actions together?", options: ["createReducer","createStore","createSlice","createAction"], answer: 2, explanation: "createSlice generates action creators and reducers from one config.", topic: "Redux" },
+  { question: "What is the purpose of useEffect's dependency array?", options: ["Runs effect on every render","Skips the effect entirely","Runs effect only when deps change","Creates a new state variable"], answer: 2, explanation: "The dependency array tells React when to re-run the effect — only when listed values change.", topic: "React.js" },
+  { question: "Which Express method sends a JSON response?", options: ["res.send()","res.json()","res.end()","res.write()"], answer: 1, explanation: "res.json() serializes an object to JSON and sets the Content-Type header automatically.", topic: "Express.js" },
+  { question: "What does MongoDB's aggregate() return?", options: ["A document","A cursor","A promise","An array"], answer: 1, explanation: "aggregate() returns a cursor that you can iterate over or convert to an array.", topic: "MongoDB" },
+  { question: "Which HTTP status code means 'Unauthorized'?", options: ["403","401","404","500"], answer: 1, explanation: "401 Unauthorized means authentication is required. 403 Forbidden means auth succeeded but access is denied.", topic: "REST API" },
+  { question: "What is middleware in Express.js?", options: ["A database connector","A function with access to req, res, next","A template engine","A static file server"], answer: 1, explanation: "Middleware functions execute during the request-response cycle and can modify req/res or call next().", topic: "Express.js" },
 ];
 
 const rankIcons = [
@@ -65,7 +70,7 @@ const QuizArena = () => {
   const fetchQuestions = async () => {
     setPhase("loading"); setLoadError(false);
     try {
-      const prompt = `Generate 5 multiple-choice quiz questions about MERN stack (${TOPICS.join(", ")}).
+      const prompt = `Generate 10 multiple-choice quiz questions about MERN stack (${TOPICS.join(", ")}).
 Return ONLY a JSON array (no markdown, no code blocks): [{"question":"...","options":["A","B","C","D"],"answer":0,"explanation":"...","topic":"..."}]
 Rules: answer is 0-based index. All 4 options must be plausible. Intermediate difficulty. Return ONLY the raw JSON array, nothing else.`;
 
@@ -181,10 +186,10 @@ Rules: answer is 0-based index. All 4 options must be plausible. Intermediate di
                   Ready to challenge yourself?
                 </h3>
                 <p style={{ color: "var(--text-secondary)" }} className="max-w-sm">
-                  5 AI-generated MERN questions. Score points for correct answers — speed bonuses apply!
+                  10 AI-generated MERN questions. Score points for correct answers — speed bonuses apply!
                 </p>
                 <div className="flex gap-6 text-center">
-                  {[["5","Questions"],["20s","Per Q"],["+10","Per Answer"],["🔥","Streak Bonus"]].map(([val, label]) => (
+                  {[["10","Questions"],["20s","Per Q"],["+10","Per Answer"],["🔥","Streak Bonus"]].map(([val, label]) => (
                     <div key={label} className="flex flex-col gap-1">
                       <span className="text-2xl font-bold bg-gradient-to-r from-cyan-500 to-purple-500 bg-clip-text text-transparent">{val}</span>
                       <span className="text-xs" style={{ color: "var(--text-muted)" }}>{label}</span>
